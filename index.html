@@ -231,7 +231,7 @@
 
             // Fetch quotes from JSON
             React.useEffect(() => {
-                fetch('./quotes_archive.json')
+                fetch('./resources/quotes_archive.json')
                     .then(res => res.json())
                     .then(data => setQuotes(data))
                     .catch(err => console.error('Failed to load quotes:', err));
