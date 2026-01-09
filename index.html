@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>everyfknday</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(200, 170, 130, 0.5) 0%, transparent 50%),
+                radial-gradient(ellipse at 75% 70%, rgba(180, 140, 100, 0.4) 0%, transparent 45%),
+                radial-gradient(ellipse at 50% 90%, rgba(160, 120, 90, 0.3) 0%, transparent 50%),
+                linear-gradient(160deg, #c4a67a 0%, #d1a875 25%, #c09565 50%, #a88560 75%, #9a7855 100%);
+            font-family: 'Libre Baskerville', Georgia, serif;
+            overflow: hidden;
+            color: #2a2420;
+        }
+
+        .space {
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Center identity */
+        .identity {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            user-select: none;
+        }
+
+        .identity-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            letter-spacing: 8px;
+            color: rgba(30, 20, 15, 0.35);
+            text-transform: lowercase;
+            opacity: 0;
+            animation: fadeIn 3s ease-out 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Quote - tucked in corner, ambient */
+        .quote-ambient {
+            position: fixed;
+            top: 50px;
+            left: 50px;
+            max-width: 420px;
+            opacity: 0;
+            animation: driftIn 1s ease-out 1.5s forwards;
+        }
+
+        .quote-text {
+            font-size: 0.95rem;
+            line-height: 1.9;
+            font-style: italic;
+            color: rgba(30, 20, 15, 0.75);
+            letter-spacing: 0.2px;
+        }
+
+        .cursor {
+            display: inline;
+            color: rgba(30, 20, 15, 0.75);
+            font-style: normal;
+        }
+
+        .cursor.blink {
+            animation: blink 0.8s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .quote-origin {
+            margin-top: 14px;
+            font-size: 0.7rem;
+            font-style: normal;
+            color: rgba(40, 30, 20, 0.55);
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .quote-origin.visible {
+            opacity: 1;
+        }
+
+        @keyframes driftIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Song - top right, minimal */
+        .song-corner {
+            position: fixed;
+            top: 45px;
+            right: 50px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            opacity: 0;
+            animation: driftIn 2s ease-out 2.5s forwards;
+            cursor: pointer;
+        }
+
+        .song-corner:hover .vinyl-small {
+            animation-play-state: running;
+        }
+
+        .vinyl-small {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #2a2420 0%, #4a4035 25%, #2a2420 50%, #4a4035 75%, #2a2420 100%);
+            position: relative;
+            animation: spin 3s linear infinite;
+            animation-play-state: paused;
+            opacity: 0.7;
+        }
+
+        .vinyl-small::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: #c4a67a;
+            border-radius: 50%;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .song-text {
+            text-align: right;
+        }
+
+        .song-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: rgba(30, 20, 15, 0.7);
+            letter-spacing: 0.5px;
+        }
+
+        .song-artist {
+            font-size: 0.65rem;
+            color: rgba(40, 30, 20, 0.5);
+            margin-top: 2px;
+        }
+
+        /* Second song - bottom right */
+        .song-corner-2 {
+            position: fixed;
+            bottom: 50px;
+            right: 50px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            opacity: 0;
+            animation: driftIn 2s ease-out 3s forwards;
+            cursor: pointer;
+        }
+
+        .song-corner-2:hover .vinyl-small {
+            animation-play-state: running;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .identity-text {
+                font-size: 0.9rem;
+                letter-spacing: 5px;
+            }
+            .quote-ambient {
+                left: 25px;
+                right: 25px;
+                bottom: 100px;
+                max-width: none;
+            }
+            .quote-text {
+                font-size: 0.85rem;
+            }
+            .song-corner {
+                top: 25px;
+                right: 25px;
+            }
+            .song-corner-2 {
+                bottom: 25px;
+                right: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const songs = [
+            { title: "Vices", artist: "Sarah Sundays" },
+            { title: "Dirty Little Secret", artist: "All-American Rejects" }
+        ];
+
+        const App = () => {
+            const [quotes, setQuotes] = React.useState([]);
+            const [currentQuote, setCurrentQuote] = React.useState(0);
+            const [displayedText, setDisplayedText] = React.useState('');
+            const [isTyping, setIsTyping] = React.useState(true);
+            const [showOrigin, setShowOrigin] = React.useState(false);
+
+            // Fetch quotes from JSON
+            React.useEffect(() => {
+                fetch('./quotes_archive.json')
+                    .then(res => res.json())
+                    .then(data => setQuotes(data))
+                    .catch(err => console.error('Failed to load quotes:', err));
+            }, []);
+
+            // Typewriter effect with natural pauses
+            React.useEffect(() => {
+                if (quotes.length === 0) return;
+                
+                const fullText = quotes[currentQuote].quote;
+                let index = 0;
+                setDisplayedText('');
+                setIsTyping(true);
+                setShowOrigin(false);
+
+                const typeNext = () => {
+                    if (index < fullText.length) {
+                        setDisplayedText(fullText.slice(0, index + 1));
+                        const char = fullText[index];
+                        index++;
+                        
+                        // Determine delay based on character
+                        let delay = 35;
+                        if (char === '.') delay = 400;
+                        else if (char === ',') delay = 200;
+                        else if (char === '?' || char === '!') delay = 400;
+                        else if (char === ';' || char === ':') delay = 250;
+                        
+                        setTimeout(typeNext, delay);
+                    } else {
+                        setIsTyping(false);
+                        setShowOrigin(true);
+                        
+                        // Wait 4 seconds then move to next quote
+                        setTimeout(() => {
+                            setCurrentQuote(prev => (prev + 1) % quotes.length);
+                        }, 4000);
+                    }
+                };
+
+                const startDelay = setTimeout(typeNext, 500);
+                return () => clearTimeout(startDelay);
+            }, [currentQuote, quotes]);
+
+            if (quotes.length === 0) {
+                return <div className="space"><div className="identity"><span className="identity-text">everyfknday</span></div></div>;
+            }
+
+            return (
+                <div className="space">
+                    {/* Center - just the name, faint */}
+                    <div className="identity">
+                        <span className="identity-text">everyfknday</span>
+                    </div>
+
+                    {/* Quote - top left, typewriter */}
+                    <div className="quote-ambient">
+                        <p className="quote-text">
+                            {displayedText}<span className={`cursor ${!isTyping ? 'blink' : ''}`}>|</span>
+                        </p>
+                        <span className={`quote-origin ${showOrigin ? 'visible' : ''}`}>— {quotes[currentQuote].origin}</span>
+                    </div>
+
+                    {/* Song - top right */}
+                    <div className="song-corner">
+                        <div className="song-text">
+                            <div className="song-title">{songs[0].title}</div>
+                            <div className="song-artist">{songs[0].artist}</div>
+                        </div>
+                        <div className="vinyl-small"></div>
+                    </div>
+
+                    {/* Song 2 - bottom right */}
+                    <div className="song-corner-2">
+                        <div className="song-text">
+                            <div className="song-title">{songs[1].title}</div>
+                            <div className="song-artist">{songs[1].artist}</div>
+                        </div>
+                        <div className="vinyl-small"></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+                        setCurrentQuote(prev => (prev + 1) % quotes.length);
+                        setKey(prev => prev + 1);
+                        setIsFading(false);
+                    }, 1000);
+                }, 10000);
+
+                return () => clearInterval(timer);
+            }, []);
+
+            return (
+                <>
+                    <div className="container">
+                        <div className={`quote-space ${isFading ? 'fading-out' : ''}`} key={key}>
+                            <p className="quote-text">"{quotes[currentQuote].text}"</p>
+                            <span className="quote-origin">— {quotes[currentQuote].origin}</span>
+                        </div>
+
+                        <div className="dots">
+                            {quotes.map((_, i) => (
+                                <div 
+                                    key={i}
+                                    className={`dot ${i === currentQuote ? 'active' : ''}`}
+                                    onClick={() => changeQuote(i)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <SongFloat song={songs[0]} position="top-left" />
+                    <SongFloat song={songs[1]} position="bottom-right" />
+
+                    <div className="watermark">everyfknday</div>
+                </>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
