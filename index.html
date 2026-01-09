@@ -109,35 +109,121 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* Song - top right, minimal */
-        .song-corner {
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Cassette pile - bottom right */
+        .cassette-pile {
             position: fixed;
-            top: 45px;
-            right: 50px;
+            bottom: 40px;
+            right: 40px;
+            width: 160px;
+            height: 180px;
+            opacity: 0;
+            animation: driftIn 2s ease-out 2s forwards;
+        }
+
+        .tape {
+            width: 120px;
+            height: 76px;
+            background: linear-gradient(180deg, #3a3530 0%, #2a2420 50%, #1a1815 100%);
+            border-radius: 4px;
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, z-index 0s;
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.1),
+                0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .tape::before {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: 12px;
+            right: 12px;
+            bottom: 16px;
+            background: rgba(60, 50, 40, 0.5);
+            border-radius: 3px;
+        }
+
+        /* Stack positions - like tossed on a desk */
+        .tape:nth-child(1) { bottom: 0; right: 0; transform: rotate(3deg); z-index: 1; }
+        .tape:nth-child(2) { bottom: 25px; right: 20px; transform: rotate(-5deg); z-index: 2; }
+        .tape:nth-child(3) { bottom: 55px; right: 5px; transform: rotate(7deg); z-index: 3; }
+        .tape:nth-child(4) { bottom: 80px; right: 25px; transform: rotate(-3deg); z-index: 4; }
+        .tape:nth-child(5) { bottom: 105px; right: 10px; transform: rotate(4deg); z-index: 5; }
+        .tape:nth-child(6) { bottom: 130px; right: 30px; transform: rotate(-6deg); z-index: 6; }
+
+        .tape:hover {
+            transform: translateY(-8px) rotate(0deg) scale(1.05) !important;
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.15),
+                0 8px 20px rgba(0,0,0,0.5),
+                0 0 25px rgba(220, 180, 130, 0.4);
+            z-index: 20 !important;
+        }
+
+        .tape.playing {
+            transform: translateY(-12px) translateX(-10px) rotate(0deg) scale(1.08) !important;
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.2),
+                0 10px 25px rgba(0,0,0,0.5),
+                0 0 30px rgba(235, 190, 120, 0.6),
+                0 0 50px rgba(220, 170, 100, 0.3);
+            z-index: 21 !important;
+        }
+
+        .tape-label {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 16px;
+            background: linear-gradient(180deg, #e8d8c0 0%, #d4b880 100%);
+            border-radius: 2px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            opacity: 0;
-            animation: driftIn 2s ease-out 2.5s forwards;
-            cursor: pointer;
+            justify-content: center;
+            overflow: hidden;
         }
 
-        .song-corner:hover .vinyl-small {
-            animation-play-state: running;
+        .tape.playing .tape-label {
+            background: linear-gradient(180deg, #f0e0c8 0%, #e0c080 100%);
+            box-shadow: 0 0 10px rgba(235, 190, 120, 0.5);
         }
 
-        .vinyl-small {
+        .tape-label-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.45rem;
+            color: rgba(40, 30, 20, 0.85);
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 4px;
+        }
+
+        .tape-reels {
+            position: absolute;
+            top: 26px;
+            left: 18px;
+            right: 18px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .tape-reel {
             width: 28px;
             height: 28px;
             border-radius: 50%;
-            background: conic-gradient(from 0deg, #2a2420 0%, #4a4035 25%, #2a2420 50%, #4a4035 75%, #2a2420 100%);
+            background: conic-gradient(from 0deg, #4a4035 0%, #2a2420 25%, #4a4035 50%, #2a2420 75%, #4a4035 100%);
             position: relative;
-            animation: spin 3s linear infinite;
-            animation-play-state: paused;
-            opacity: 0.7;
         }
 
-        .vinyl-small::after {
+        .tape-reel::after {
             content: '';
             position: absolute;
             top: 50%;
@@ -145,46 +231,181 @@
             transform: translate(-50%, -50%);
             width: 8px;
             height: 8px;
-            background: #c4a67a;
+            background: #1a1815;
             border-radius: 50%;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .tape.playing .tape-reel {
+            animation: spin 1.5s linear infinite;
         }
 
-        .song-text {
-            text-align: right;
+        .tape-window {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 6px;
+            background: rgba(20, 15, 10, 0.6);
+            border-radius: 2px;
         }
 
-        .song-title {
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 
+                    inset 0 1px 0 rgba(255,255,255,0.2),
+                    0 2px 4px rgba(0,0,0,0.3),
+                    0 0 25px rgba(235, 190, 120, 0.7),
+                    0 0 50px rgba(220, 170, 100, 0.4),
+                    0 0 80px rgba(200, 150, 80, 0.2);
+            }
+            50% {
+                box-shadow: 
+                    inset 0 1px 0 rgba(255,255,255,0.2),
+                    0 2px 4px rgba(0,0,0,0.3),
+                    0 0 30px rgba(235, 190, 120, 0.85),
+                    0 0 60px rgba(220, 170, 100, 0.5),
+                    0 0 90px rgba(200, 150, 80, 0.25);
+            }
+        }
+
+        @keyframes tapeMove {
+            0% { background-position: 0% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Big now-playing cassette - top right */
+        .now-playing {
+            position: fixed;
+            top: 50px;
+            right: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+        }
+
+        .now-playing.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cassette-big {
+            width: 140px;
+            height: 88px;
+            background: linear-gradient(180deg, #3a3530 0%, #2a2420 50%, #1a1815 100%);
+            border-radius: 6px;
+            position: relative;
+            box-shadow: 
+                inset 0 2px 0 rgba(255,255,255,0.1),
+                0 4px 12px rgba(0,0,0,0.4),
+                0 0 40px rgba(235, 190, 120, 0.6),
+                0 0 80px rgba(220, 170, 100, 0.35),
+                0 0 120px rgba(200, 150, 80, 0.15);
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        .cassette-big::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 14px;
+            right: 14px;
+            bottom: 20px;
+            background: rgba(80, 60, 50, 0.4);
+            border-radius: 4px;
+        }
+
+        .cassette-big .cassette-label-big {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 20px;
+            background: linear-gradient(180deg, #f0dfc0 0%, #e0b870 100%);
+            border-radius: 2px;
+            box-shadow: 0 0 15px rgba(235, 190, 120, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-display {
             font-family: 'Space Mono', monospace;
-            font-size: 0.7rem;
-            color: rgba(30, 20, 15, 0.7);
+            font-size: 0.55rem;
+            color: rgba(40, 30, 20, 0.85);
             letter-spacing: 0.5px;
         }
 
-        .song-artist {
-            font-size: 0.65rem;
-            color: rgba(40, 30, 20, 0.5);
-            margin-top: 2px;
-        }
-
-        /* Second song - bottom right */
-        .song-corner-2 {
-            position: fixed;
-            bottom: 50px;
-            right: 50px;
+        .cassette-big .reels-container-big {
+            position: absolute;
+            top: 32px;
+            left: 22px;
+            right: 22px;
             display: flex;
-            align-items: center;
-            gap: 14px;
-            opacity: 0;
-            animation: driftIn 2s ease-out 3s forwards;
-            cursor: pointer;
+            justify-content: space-between;
         }
 
-        .song-corner-2:hover .vinyl-small {
-            animation-play-state: running;
+        .cassette-big .reel-big {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #4a4035 0%, #2a2420 25%, #4a4035 50%, #2a2420 75%, #4a4035 100%);
+            position: relative;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .cassette-big .reel-big::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #1a1815;
+            border-radius: 50%;
+        }
+
+        .cassette-big .tape-ribbon-big {
+            position: absolute;
+            top: 46px;
+            left: 50px;
+            right: 50px;
+            height: 10px;
+            background: linear-gradient(90deg, 
+                #1a1510 0%, 
+                #2a2015 20%, 
+                #1a1510 40%,
+                #2a2015 60%,
+                #1a1510 80%,
+                #2a2015 100%);
+            background-size: 200% 100%;
+            border-radius: 2px;
+            animation: tapeMove 1s linear infinite;
+        }
+
+        .now-playing-text {
+            text-align: center;
+        }
+
+        .now-playing-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: rgba(30, 20, 15, 0.9);
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(220, 180, 130, 0.4);
+        }
+
+        .now-playing-artist {
+            font-size: 0.75rem;
+            color: rgba(40, 30, 20, 0.65);
+            margin-top: 4px;
         }
 
         /* Responsive */
@@ -217,17 +438,69 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const songs = [
-            { title: "Vices", artist: "Sarah Sundays" },
-            { title: "Dirty Little Secret", artist: "All-American Rejects" }
-        ];
-
         const App = () => {
             const [quotes, setQuotes] = React.useState([]);
+            const [songs, setSongs] = React.useState([]);
             const [currentQuote, setCurrentQuote] = React.useState(0);
             const [displayedText, setDisplayedText] = React.useState('');
             const [isTyping, setIsTyping] = React.useState(true);
             const [showOrigin, setShowOrigin] = React.useState(false);
+            const [loadedIndex, setLoadedIndex] = React.useState(null);
+            const [isPlaying, setIsPlaying] = React.useState(false);
+            const [isLoading, setIsLoading] = React.useState(false);
+            const [currentTime, setCurrentTime] = React.useState(0);
+            const [duration, setDuration] = React.useState(0);
+            const audioRef = React.useRef(null);
+
+            // Initialize single Audio element once
+            React.useEffect(() => {
+                const audio = new Audio();
+                
+                audio.addEventListener('ended', () => {
+                    setIsPlaying(false);
+                });
+                
+                audio.addEventListener('pause', () => {
+                    setIsPlaying(false);
+                });
+                
+                audio.addEventListener('play', () => {
+                    setIsPlaying(true);
+                });
+                
+                audio.addEventListener('canplaythrough', () => {
+                    setIsLoading(false);
+                });
+                
+                audio.addEventListener('error', (e) => {
+                    console.error('Audio error:', e);
+                    setIsLoading(false);
+                    setIsPlaying(false);
+                });
+                
+                audio.addEventListener('timeupdate', () => {
+                    setCurrentTime(audio.currentTime);
+                });
+                
+                audio.addEventListener('loadedmetadata', () => {
+                    setDuration(audio.duration);
+                });
+                
+                audioRef.current = audio;
+                
+                return () => {
+                    audio.pause();
+                    audio.src = '';
+                };
+            }, []);
+
+            // Format seconds to mm:ss
+            const formatTime = (seconds) => {
+                if (!seconds || isNaN(seconds)) return '0:00';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
 
             // Fetch quotes from JSON
             React.useEffect(() => {
@@ -236,6 +509,50 @@
                     .then(data => setQuotes(data))
                     .catch(err => console.error('Failed to load quotes:', err));
             }, []);
+
+            // Fetch songs from JSON
+            React.useEffect(() => {
+                fetch('./resources/songs.json')
+                    .then(res => res.json())
+                    .then(songFiles => {
+                        console.log('Loaded songs:', songFiles);
+                        const songsData = songFiles.map(song => ({
+                            title: song.file.replace('.mp3', ''),
+                            artist: song.artist || '',
+                            file: `./resources/songs/${song.file}`
+                        }));
+                        console.log('Processed songs:', songsData);
+                        setSongs(songsData);
+                    })
+                    .catch(err => {
+                        console.error('Failed to load songs:', err);
+                    });
+            }, []);
+
+            const playSong = (index) => {
+                const audio = audioRef.current;
+                if (!audio || isLoading) return; // Prevent clicks during load
+                
+                // Clicking the same song that's loaded
+                if (loadedIndex === index) {
+                    if (isPlaying) {
+                        audio.pause();
+                    } else {
+                        audio.play().catch(err => console.error('Play failed:', err));
+                    }
+                    return;
+                }
+                
+                // Different song - load and play
+                setIsLoading(true);
+                setLoadedIndex(index);
+                audio.src = songs[index].file;
+                audio.load();
+                audio.play().catch(err => {
+                    console.error('Play failed:', err);
+                    setIsLoading(false);
+                });
+            };
 
             // Typewriter effect with natural pauses
             React.useEffect(() => {
@@ -295,65 +612,46 @@
                         <span className={`quote-origin ${showOrigin ? 'visible' : ''}`}>— {quotes[currentQuote].origin}</span>
                     </div>
 
-                    {/* Song - top right */}
-                    <div className="song-corner">
-                        <div className="song-text">
-                            <div className="song-title">{songs[0].title}</div>
-                            <div className="song-artist">{songs[0].artist}</div>
+                    {/* Big now-playing cassette - top right */}
+                    <div className={`now-playing ${isPlaying && loadedIndex !== null ? 'visible' : ''}`}>
+                        <div className="cassette-big">
+                            <div className="cassette-label-big">
+                                <span className="time-display">{formatTime(currentTime)} / {formatTime(duration)}</span>
+                            </div>
+                            <div className="tape-ribbon-big"></div>
+                            <div className="reels-container-big">
+                                <div className="reel-big"></div>
+                                <div className="reel-big"></div>
+                            </div>
                         </div>
-                        <div className="vinyl-small"></div>
+                        {loadedIndex !== null && songs[loadedIndex] && (
+                            <div className="now-playing-text">
+                                <div className="now-playing-title">{songs[loadedIndex].title}</div>
+                                <div className="now-playing-artist">{songs[loadedIndex].artist}</div>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Song 2 - bottom right */}
-                    <div className="song-corner-2">
-                        <div className="song-text">
-                            <div className="song-title">{songs[1].title}</div>
-                            <div className="song-artist">{songs[1].artist}</div>
-                        </div>
-                        <div className="vinyl-small"></div>
+                    {/* Cassette pile - bottom right */}
+                    <div className="cassette-pile">
+                        {songs.map((song, index) => (
+                            <div 
+                                key={index} 
+                                className={`tape ${isPlaying && loadedIndex === index ? 'playing' : ''}`} 
+                                onClick={() => playSong(index)}
+                            >
+                                <div className="tape-label">
+                                    <span className="tape-label-text">{song.title}</span>
+                                </div>
+                                <div className="tape-reels">
+                                    <div className="tape-reel"></div>
+                                    <div className="tape-reel"></div>
+                                </div>
+                                <div className="tape-window"></div>
+                            </div>
+                        ))}
                     </div>
                 </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
-                        setCurrentQuote(prev => (prev + 1) % quotes.length);
-                        setKey(prev => prev + 1);
-                        setIsFading(false);
-                    }, 1000);
-                }, 10000);
-
-                return () => clearInterval(timer);
-            }, []);
-
-            return (
-                <>
-                    <div className="container">
-                        <div className={`quote-space ${isFading ? 'fading-out' : ''}`} key={key}>
-                            <p className="quote-text">"{quotes[currentQuote].text}"</p>
-                            <span className="quote-origin">— {quotes[currentQuote].origin}</span>
-                        </div>
-
-                        <div className="dots">
-                            {quotes.map((_, i) => (
-                                <div 
-                                    key={i}
-                                    className={`dot ${i === currentQuote ? 'active' : ''}`}
-                                    onClick={() => changeQuote(i)}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    <SongFloat song={songs[0]} position="top-left" />
-                    <SongFloat song={songs[1]} position="bottom-right" />
-
-                    <div className="watermark">everyfknday</div>
-                </>
             );
         };
 
